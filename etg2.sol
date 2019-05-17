@@ -10,9 +10,8 @@ pragma solidity >=0.4.22 <0.6.0;
 
 
 /**
- * @title owned
- * @dev The owned contract has an owner address, and provides basic authorization control
- * functions, this simplifies the implementation of &quot;user permissions&quot;.
+ * The owned contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of user permissions.
  */
 contract owned {
     address public owner;
@@ -24,7 +23,7 @@ contract owned {
     }
 
     /**
-     * @dev Throws if called by any account other than the owner.
+     * Throws if called by any account other than the owner.
      */
     modifier onlyOwner {
         require(msg.sender == owner);
@@ -32,8 +31,8 @@ contract owned {
     }
 
     /**
-     * @dev Allows the current owner to transfer control of the contract to a newOwner.
-     * @param newOwner The address to transfer ownership to.
+     * Allows the current owner to transfer control of the contract to a newOwner.
+     * NewOwner The address to transfer ownership to.
      */
     function transferOwnership(address newOwner) onlyOwner public {
         require(newOwner != address(0));
@@ -43,7 +42,7 @@ contract owned {
 }
 
 /**
-* @dev Interface provided to external calls.
+* Interface provided to external calls.
 */
 interface tokenRecipient {
     function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external; 
@@ -79,8 +78,7 @@ contract TokenERC20 {
     event Burn(address indexed from, uint256 value);
 
     /**
-     * @title Constrctor function
-     * @dev Initializes contract with initial supply tokens to the creator of the contract
+     * Initializes contract with initial supply tokens to the creator of the contract.
      */
     constructor(
         uint256 initialSupply = 1,
@@ -94,7 +92,7 @@ contract TokenERC20 {
     }
 
     /**
-     * @dev Internal transfer, only can be called by this contract
+     * Internal transfer, only can be called by this contract.
      */
     function _transfer(address _from, address _to, uint256 _value) internal {
         // Prevent transfer to 0x0 address. Use burn() instead
@@ -115,12 +113,8 @@ contract TokenERC20 {
     }
 
     /**
-     * @title Transfer tokens
-     *
-     * @dev Send `_value` tokens to `_to` from your account
-     *
-     * @param _to The address of the recipient
-     * @param _value the amount to send
+     * Transfer tokens
+     * Send `_value` tokens to `_to` from your account.
      */
     function transfer(address _to, uint256 _value) public returns (bool success) {
         _transfer(msg.sender, _to, _value);
@@ -129,12 +123,7 @@ contract TokenERC20 {
 
     /**
      * Transfer tokens from other address
-     *
-     * Send `_value` tokens to `_to` in behalf of `_from`
-     *
-     * @param _from The address of the sender
-     * @param _to The address of the recipient
-     * @param _value the amount to send
+     * Send `_value` tokens to `_to` in behalf of `_from`.
      */
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= allowance[_from][msg.sender]);     // Check allowance
@@ -145,11 +134,7 @@ contract TokenERC20 {
 
     /**
      * Set allowance for other address
-     *
-     * Allows `_spender` to spend no more than `_value` tokens in your behalf
-     *
-     * @param _spender The address authorized to spend
-     * @param _value the max amount they can spend
+     * Allows `_spender` to spend no more than `_value` tokens in your behalf.
      */
     function approve(address _spender, uint256 _value) public
         returns (bool success) {
@@ -160,12 +145,7 @@ contract TokenERC20 {
 
     /**
      * Set allowance for other address and notify
-     *
-     * Allows `_spender` to spend no more than `_value` tokens in your behalf, and then ping the contract about it
-     *
-     * @param _spender The address authorized to spend
-     * @param _value the max amount they can spend
-     * @param _extraData some extra information to send to the approved contract
+     * Allows `_spender` to spend no more than `_value` tokens in your behalf, and then ping the contract about it.
      */
     function approveAndCall(address _spender, uint256 _value, bytes memory _extraData)
         public
@@ -179,10 +159,7 @@ contract TokenERC20 {
 
     /**
      * Destroy tokens
-     *
-     * Remove `_value` tokens from the system irreversibly
-     *
-     * @param _value the amount of money to burn
+     * Remove `_value` tokens from the system irreversibly.
      */
     function burn(uint256 _value) public returns (bool success) {
         require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
@@ -194,11 +171,7 @@ contract TokenERC20 {
 
     /**
      * Destroy tokens from other account
-     *
      * Remove `_value` tokens from the system irreversibly on behalf of `_from`.
-     *
-     * @param _from the address of the sender
-     * @param _value the amount of money to burn
      */
     function burnFrom(address _from, uint256 _value) public returns (bool success) {
         require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
@@ -210,16 +183,16 @@ contract TokenERC20 {
         return true;
     }
 
-    // 定期释放
+    // Release tokens according to relevant rules
     function releaseToken() public onlyOwner returns(bool) {
         uint256 _value;
         uint _calcTime;
-        // 检查是否发行过
+        // Time difference
         _calcTime = block.timestamp-timeBegin;
         if (releaseRecord[_calcTime/interval days] == true){
             return false;
         }
-        // 计算当前应该释放量，释放条件必须当前代币总量小于代币限定总量
+        // To calculate the current amount that should be released
         if (_calcTime <= interval days){
             _value = 100000;
         } else if (_calcTime <= 2 * interval days) && totalSupply < 10000000{
@@ -227,11 +200,11 @@ contract TokenERC20 {
         } else {
             return false;
         }
-        // 释放的token交给合约所有者
+        // The tokens released are given to the contract owner
         balanceOf[owner] += _value;
         totalSupply += _value;
         Transfer(0, owner, _value);
-        // 释放记录
+        
         releaseRecord[_calcTime/interval days] = true;
         return true;
     }
