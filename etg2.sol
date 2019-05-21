@@ -183,29 +183,4 @@ contract TokenERC20 {
         return true;
     }
 
-    // Release tokens according to relevant rules
-    function releaseToken() public onlyOwner returns(bool) {
-        uint256 _value;
-        uint _calcTime;
-        // Time difference
-        _calcTime = block.timestamp-timeBegin;
-        if (releaseRecord[_calcTime/interval days] == true){
-            return false;
-        }
-        // To calculate the current amount that should be released
-        if (_calcTime <= interval days){
-            _value = 100000;
-        } else if (_calcTime <= 2 * interval days) && totalSupply < 10000000{
-            _value = 200000;
-        } else {
-            return false;
-        }
-        // The tokens released are given to the contract owner
-        balanceOf[owner] += _value;
-        totalSupply += _value;
-        Transfer(0, owner, _value);
-        
-        releaseRecord[_calcTime/interval days] = true;
-        return true;
-    }
 }
