@@ -4,10 +4,53 @@
 *
 */
 
-import "./SafeMath.sol";
-
 pragma solidity >=0.4.22 <0.6.0;
 
+/**
+ * @title SafeMath
+ * @dev Math operations with safety checks that throw on error
+ */
+library SafeMath {
+
+  /**
+  * @dev Multiplies two numbers, throws on overflow.
+  */
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    if (a == 0) {
+      return 0;
+    }
+    uint256 c = a * b;
+    assert(c / a == b);
+    return c;
+  }
+
+  /**
+  * @dev Integer division of two numbers, truncating the quotient.
+  */
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    // assert(b > 0); // Solidity automatically throws when dividing by 0
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+    return c;
+  }
+
+  /**
+  * @dev Substracts two numbers, throws on overflow (i.e. if subtrahend is greater than minuend).
+  */
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    assert(b <= a);
+    return a - b;
+  }
+
+  /**
+  * @dev Adds two numbers, throws on overflow.
+  */
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    assert(c >= a);
+    return c;
+  }
+}
 
 /**
  * The owned contract has an owner address, and provides basic authorization control
@@ -36,7 +79,7 @@ contract owned {
      */
     function transferOwnership(address newOwner) onlyOwner public {
         require(newOwner != address(0));
-        OwnershipTransferred(owner, newOwner);
+        emit OwnershipTransferred(owner, newOwner);
         owner = newOwner;
     }
 }
@@ -45,7 +88,7 @@ contract owned {
 * Interface provided to external calls.
 */
 interface tokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes calldata _extraData) external; 
+    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) external; 
 }
 
 contract TokenERC20 {
@@ -55,7 +98,7 @@ contract TokenERC20 {
     // Public variables of the token
     string public name;
     string public symbol;
-    uint8 public decimals = 18;
+    uint8 public decimals = 8;
     // 18 decimals is the strongly suggested default, avoid changing it
     
     uint256 public totalSupply;
@@ -81,9 +124,9 @@ contract TokenERC20 {
      * Initializes contract with initial supply tokens to the creator of the contract.
      */
     constructor(
-        uint256 initialSupply = 1,
-        string memory tokenName = "token",
-        string memory tokenSymbol = "token"
+        uint256 initialSupply,
+        string memory tokenName,
+        string memory tokenSymbol
     ) public {
         totalSupply = initialSupply * 10 ** uint256(decimals);  // Update total supply with the decimal amount
         balanceOf[msg.sender] = totalSupply;                    // Give the creator all initial tokens
