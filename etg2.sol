@@ -105,7 +105,6 @@ contract TokenERC20 {
 
     // Contract generation time
     uint public timeBegin;
-    mapping (uint => bool) public releaseRecord;
 
     // This creates an array with all balances
     mapping (address => uint256) public balanceOf;
@@ -198,32 +197,6 @@ contract TokenERC20 {
             spender.receiveApproval(msg.sender, _value, address(this), _extraData);
             return true;
         }
-    }
-
-    /**
-     * Destroy tokens
-     * Remove `_value` tokens from the system irreversibly.
-     */
-    function burn(uint256 _value) public returns (bool success) {
-        require(balanceOf[msg.sender] >= _value);   // Check if the sender has enough
-        balanceOf[msg.sender] -= _value;            // Subtract from the sender
-        totalSupply -= _value;                      // Updates totalSupply
-        emit Burn(msg.sender, _value);
-        return true;
-    }
-
-    /**
-     * Destroy tokens from other account
-     * Remove `_value` tokens from the system irreversibly on behalf of `_from`.
-     */
-    function burnFrom(address _from, uint256 _value) public returns (bool success) {
-        require(balanceOf[_from] >= _value);                // Check if the targeted balance is enough
-        require(_value <= allowance[_from][msg.sender]);    // Check allowance
-        balanceOf[_from] -= _value;                         // Subtract from the targeted balance
-        allowance[_from][msg.sender] -= _value;             // Subtract from the sender's allowance
-        totalSupply -= _value;                              // Update totalSupply
-        emit Burn(_from, _value);
-        return true;
     }
 
 }
