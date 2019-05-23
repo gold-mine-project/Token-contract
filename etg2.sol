@@ -93,6 +93,8 @@ interface tokenRecipient {
 
 contract TokenERC20 {
 
+   //Multi-trans need to be added
+
 	using SafeMath for uint256;
 		
     // Public variables of the token
