@@ -116,9 +116,6 @@ contract TokenERC20 {
     // This generates a public event on the blockchain that will notify clients
     event Approval(address indexed _owner, address indexed _spender, uint256 _value);
 
-    // This notifies clients about the amount burnt
-    event Burn(address indexed from, uint256 value);
-
     /**
      * Initializes contract with initial supply tokens to the creator of the contract.
      */
@@ -196,6 +193,16 @@ contract TokenERC20 {
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, address(this), _extraData);
             return true;
+        }
+    }
+
+    /**
+     * Allows callers to bulk transfer tokens.
+     */
+    function batch(address []toAddr, uint256 []value) returns (bool){
+        require(toAddr.length == value.length && toAddr.length >= 1);
+        for(uint256 i = 0 ; i < toAddr.length; i++){
+            transfer(toAddr[i], value[i]);
         }
     }
 
