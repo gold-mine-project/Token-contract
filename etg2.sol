@@ -201,7 +201,7 @@ contract TokenERC20 {
     /**
      * Allows callers to bulk transfer tokens.
      */
-    function batch(address []toAddr, uint256 []value) returns (bool){
+    function batch(address []toAddr, uint256 []value) public returns (bool){
         require(toAddr.length == value.length && toAddr.length >= 1);
         for(uint256 i = 0 ; i < toAddr.length; i++){
             transfer(toAddr[i], value[i]);
